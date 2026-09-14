@@ -2,6 +2,7 @@ name: Build Mac App
 
 on: [push]
 
+
 jobs:
   build-mac:
     runs-on: macos-13
