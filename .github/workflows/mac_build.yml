@@ -18,9 +18,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install customtkinter pillow pyinstaller
 
-      - name: Build with PyInstaller
+      - name: Build with PyInstaller (Universal Bundle)
         run: |
-          pyinstaller --noconsole --onedir --add-data "fotografimiz.png:." main.py
+          pyinstaller --noconsole --windowed --add-data "fotografimiz.png:." main.py
 
       - name: Zip Build
         run: |
