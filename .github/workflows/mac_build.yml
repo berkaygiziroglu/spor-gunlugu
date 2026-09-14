@@ -21,26 +21,27 @@ jobs:
       - name: Gerekli Paketleri Ve PyInstaller'i Kur
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller create-dmg
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pyinstaller customtkinter pillow create-dmg
 
       - name: Uygulamayi Mac (.app) Olarak Derle
         run: |
-          # main.py kismini kendi dosya adinizla degistirmeyi unutmayin!
-          pyinstaller --noconfirm --onedir --windowed --name "Uygulamam" main.py
+          pyinstaller --noconfirm --onedir --windowed \
+            --collect-all customtkinter \
+            --collect-all PIL \
+            --name "SporGunlugu" main.py
 
       - name: .dmg Dosyasini Olustur
         run: |
           create-dmg \
-            --volname "Uygulamam Kurulum" \
+            --volname "Spor Gunlugu Kurulum" \
             --window-size 800 400 \
             --icon-size 100 \
             --app-drop-link 600 185 \
-            "Uygulamam.dmg" \
-            "dist/Uygulamam.app" || true
+            "SporGunlugu.dmg" \
+            "dist/SporGunlugu.app" || true
 
       - name: DMG Dosyasini Indirilebilir Artifact Olarak Yukle
         uses: actions/upload-artifact@v4
         with:
-          name: Mac-Uygulamam-DMG
-          path: Uygulamam.dmg
+          name: Mac-SporGunlugu-DMG
+          path: SporGunlugu.dmg
