@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build-mac:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
 
@@ -18,14 +18,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install customtkinter pillow pyinstaller
 
-      - name: Build with PyInstaller (Universal Bundle)
+      - name: Build with PyInstaller
         run: |
-          pyinstaller --noconsole --windowed --add-data "fotografimiz.png:." main.py
+          pyinstaller --noconsole --windowed --target-arch universal2 --add-data "fotografimiz.png:." main.py
 
-      - name: Zip Build
+      - name: Fix Permissions and Zip
         run: |
           cd dist
-          zip -r Spor_Gunlugu_Mac.zip main.app
+          chmod -R +x main.app
+          zip -r -y Spor_Gunlugu_Mac.zip main.app
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
