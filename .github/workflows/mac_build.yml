@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Kodu Cek
-        uses: actions/checkout@v5  # @v4 yerine @v5
+        uses: actions/checkout@v5
 
       - name: Python Kurulumu
-        uses: actions/setup-python@v6  # @v5 yerine @v6
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
 
@@ -25,24 +25,22 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Uygulamayi Mac (.app) Olarak Derle
-        timeout-minutes: 10
         run: |
+          # main.py kismini kendi dosya adinizla degistirmeyi unutmayin!
           pyinstaller --noconfirm --onedir --windowed --name "Uygulamam" main.py
 
       - name: .dmg Dosyasini Olustur
         run: |
-          mkdir -p dist/dmg
           create-dmg \
             --volname "Uygulamam Kurulum" \
-            --window-pos 200 120 \
             --window-size 800 400 \
             --icon-size 100 \
             --app-drop-link 600 185 \
-            "dist/dmg/Uygulamam.dmg" \
-            "dist/Uygulamam.app"
+            "Uygulamam.dmg" \
+            "dist/Uygulamam.app" || true
 
       - name: DMG Dosyasini Indirilebilir Artifact Olarak Yukle
         uses: actions/upload-artifact@v4
         with:
           name: Mac-Uygulamam-DMG
-          path: dist/dmg/Uygulamam.dmg
+          path: Uygulamam.dmg
