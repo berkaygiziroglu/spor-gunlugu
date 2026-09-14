@@ -1,36 +1,49 @@
-name: Build Mac App
+name: Mac DMG Olusturucu
 
-on: [push]
-
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Isteginiz zaman manuel baslatabilmeniz icin
 
 jobs:
-  build-mac:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
+  build-macos:
+    runs-on: macos-latest
 
-      - name: Set up Python
+    steps:
+      - name: Kodu Cek
+        uses: actions/checkout@v4
+
+      - name: Python Kurulumu
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Gerekli Paketleri Ve PyInstaller'i Kur
         run: |
           python -m pip install --upgrade pip
-          pip install customtkinter pillow pyinstaller
+          pip install pyinstaller create-dmg
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Build with PyInstaller
+      - name: Uygulamayi Mac (.app) Olarak Derle
+        timeout-minutes: 10
         run: |
-          pyinstaller --noconsole --windowed --target-arch universal2 --add-data "fotografimiz.png:." main.py
+          # main.py dosya adinizi kendi ana Python dosyanizin adiyla degistirin
+          pyinstaller --noconfirm --onedir --windowed --name "Uygulamam" main.py
 
-      - name: Fix Permissions and Zip
+      - name: .dmg Dosyasini Olustur
         run: |
-          cd dist
-          chmod -R +x main.app
-          zip -r -y Spor_Gunlugu_Mac.zip main.app
+          mkdir -p dist/dmg
+          create-dmg \
+            --volname "Uygulamam Kurulum" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --app-drop-link 600 185 \
+            "dist/dmg/Uygulamam.dmg" \
+            "dist/Uygulamam.app"
 
-      - name: Upload Artifact
+      - name: DMG Dosyasini Indirilebilir Artifact Olarak Yukle
         uses: actions/upload-artifact@v4
         with:
-          name: Spor_Gunlugu_Mac
-          path: dist/Spor_Gunlugu_Mac.zip
+          name: Mac-Uygulamam-DMG
+          path: dist/dmg/Uygulamam.dmg
